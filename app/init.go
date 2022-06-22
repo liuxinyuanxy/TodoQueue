@@ -1,6 +1,7 @@
 package app
 
 import (
+	"TodoQueue/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
@@ -11,6 +12,8 @@ func InitWebFramework() {
 	e = echo.New()
 	e.HideBanner = true
 	addRoutes()
+	e.Validator = &utils.CustomValidator{}
+
 	logrus.Info("echo framework initialized")
 }
 

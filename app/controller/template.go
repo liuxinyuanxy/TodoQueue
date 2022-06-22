@@ -5,6 +5,7 @@ import (
 	"TodoQueue/model"
 	"github.com/jinzhu/copier"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -23,6 +24,7 @@ func AddTemplate(c echo.Context) error {
 		err = c.Validate(&templateRequest)
 	}
 	if !ok || err != nil {
+		logrus.Info(err)
 		return c.JSON(http.StatusBadRequest, response.Response{Code: 10010, Msg: "get uid or template wrong"})
 	}
 	template := model.Template{}
@@ -47,6 +49,7 @@ func DeleteTemplate(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.Response{Code: 10010, Msg: "get tid wrong"})
 	}
 	if err := model.DeleteTemplate(tid); err != nil {
+		logrus.Info(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{Msg: "Delete template failed"})
 	}
 	return c.JSON(http.StatusOK, response.Response{})

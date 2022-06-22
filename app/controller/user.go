@@ -6,6 +6,7 @@ import (
 	"TodoQueue/utils"
 	"errors"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"net/http"
@@ -17,12 +18,10 @@ import (
 // @summary Sign in
 // @description a new user signs in
 // @router /user/register [post]
-// @accept	application/x-www-form-urlencoded
 // @param email query string true "user's email"
 // @param passwd query string true "user's password"
 // @param name query string true "user's nickname"
 // @produce json
-// @failure  202  {object}  response.Response
 func SignIn(c echo.Context) error {
 	// first, we get the name and password
 	var email, passwd, name string
@@ -71,6 +70,7 @@ func LogIn(c echo.Context) error {
 	// if success, we set the token so that the user needn't log in every time
 	tokenString, expireAt, err := utils.GenerateJwt(dbUser.ID)
 	if err != nil {
+		logrus.Error(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{Msg: "Can not generate token"})
 	}
 	cookies := &http.Cookie{Name: "token", Value: tokenString, Expires: expireAt, Path: "/"}

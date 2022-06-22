@@ -2,7 +2,6 @@ package utils
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"github.com/spf13/viper"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,7 +13,7 @@ func GenerateJwt(uid uint) (string, time.Time, error) {
 		ExpiresAt: expireAt.Unix(),
 		Subject:   strconv.Itoa(int(uid)),
 	})
-	tokenString, err := token.SignedString(viper.GetString("jwtKey"))
+	tokenString, err := token.SignedString([]byte("thisisAkeyqwq"))
 	return tokenString, expireAt, err
 }
 

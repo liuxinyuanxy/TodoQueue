@@ -11,15 +11,15 @@ func addRoutes() {
 
 	api.GET("/doc/*", echoSwagger.WrapHandler)
 
-	user := api.Group("user")
+	user := api.Group("/user")
 	user.GET("/logout", controller.LogOut)
 	user.POST("/login", controller.LogIn)
 	user.POST("/register", controller.SignIn)
-	userChange := user.Group("change", middleware.Auth)
+	userChange := user.Group("/change", middleware.Auth)
 	userChange.POST("/passwd", controller.ChangePassword)
 	userChange.POST("/name", controller.ChangeNickname)
 
-	template := api.Group("template", middleware.Auth)
+	template := api.Group("/template", middleware.Auth)
 	template.GET("/get", controller.GetTemplate)
 	template.POST("/delete", controller.DeleteTemplate)
 	template.POST("/add", controller.AddTemplate)
