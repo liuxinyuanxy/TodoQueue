@@ -1,10 +1,15 @@
 package model
 
+import (
+	"database/sql/driver"
+	"encoding/json"
+)
+
 type Todo struct {
-	ID    uint `gorm:"not null;autoIncrement"`
-	UID   uint
-	Title string
-	//Subtasks   []Subtask
+	ID         uint `gorm:"not null;autoIncrement"`
+	UID        uint
+	Title      string
+	Subtasks   subtaskList
 	LastWorkT  string  //上一次进行todo的时间
 	Ddl        string  //ddl
 	EstimatedT string  //预计耗时
@@ -13,15 +18,25 @@ type Todo struct {
 }
 
 type TodoDone struct {
-	ID    uint `gorm:"not null;autoIncrement"`
-	UID   uint
-	Title string
-	//Subtasks   []Subtask
+	ID         uint `gorm:"not null;autoIncrement"`
+	UID        uint
+	Title      string
+	Subtasks   subtaskList
 	EstimatedT string
 	SpentT     string
 }
 
 type Subtask struct {
-	Title string //子项的标题
-	Done  bool   //是否完成
+	Title string `json:"title"`
+	Done  bool   `json:"done"`
+}
+
+type subtaskList []Subtask
+
+func (p subtaskList) Value() (driver.Value, error) {
+	return json.Marshal(p)
+}
+
+func (p *subtaskList) Scan(data interface{}) error {
+	return json.Unmarshal(data.([]byte), &p)
 }
