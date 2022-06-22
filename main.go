@@ -6,9 +6,9 @@
 package main
 
 import (
-	"go-svc-tpl/app"
-	_ "go-svc-tpl/docs"
-	"go-svc-tpl/model"
+	"TodoQueue/app"
+	_ "TodoQueue/docs"
+	"TodoQueue/model"
 )
 
 func main() {

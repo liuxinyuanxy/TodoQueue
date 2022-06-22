@@ -1,10 +1,10 @@
 package middleware
 
 import (
+	"TodoQueue/app/response"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
-	"go-svc-tpl/app/response"
 	"net/http"
 	"strconv"
 )

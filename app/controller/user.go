@@ -1,11 +1,11 @@
 package controller
 
 import (
+	"TodoQueue/app/response"
+	"TodoQueue/model"
+	"TodoQueue/utils"
 	"errors"
 	"github.com/labstack/echo/v4"
-	"go-svc-tpl/app/response"
-	"go-svc-tpl/model"
-	"go-svc-tpl/utils"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"net/http"

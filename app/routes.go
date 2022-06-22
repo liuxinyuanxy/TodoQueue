@@ -1,9 +1,9 @@
 package app
 
 import (
+	"TodoQueue/app/controller"
+	"TodoQueue/app/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
-	"go-svc-tpl/app/controller"
-	"go-svc-tpl/app/middleware"
 )
 
 func addRoutes() {
