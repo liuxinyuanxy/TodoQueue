@@ -1,0 +1,7 @@
+psql:
+  user: foo
+  password: bar
+  host: 127.0.0.1
+  port: 5432
+  dbname:
+jwtKey: hy3f47y78qwehfchy67uqwcf4h8

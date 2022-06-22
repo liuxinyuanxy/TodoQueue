@@ -12,7 +12,7 @@ var db *gorm.DB
 
 func Init() {
 	connectDatabase()
-	err := db.AutoMigrate(&User{}, &Todo{}, &TodoDone{})
+	err := db.AutoMigrate(&User{}, &Todo{}, &TodoDone{}, &Template{})
 	if err != nil {
 		logrus.Fatal(err)
 	}

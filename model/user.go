@@ -10,7 +10,6 @@ type User struct {
 	Nickname   string `gorm:"column:name;size:40;not null"`
 	Password   []byte `gorm:"column:password;not null"`
 	InProgress string
-	Stared     []uint
 }
 
 func CreateUser(newUser *User) error {

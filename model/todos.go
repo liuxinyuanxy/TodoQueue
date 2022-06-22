@@ -9,8 +9,8 @@ type Todo struct {
 	Subtasks   []Subtask
 	LastWorkT  time.Time //上一次进行todo的时间
 	Ddl        time.Time //ddl
-	EstimatedT int       //预计耗时
-	SpentT     int       //实际耗时
+	EstimatedT time.Time //预计耗时
+	SpentT     time.Time //实际耗时
 	Priority   float64   //优先级
 }
 
@@ -19,10 +19,8 @@ type TodoDone struct {
 	UID        uint
 	Title      string
 	Subtasks   []Subtask
-	LastWorkT  time.Time //上一次进行todo的时间
-	Ddl        time.Time //ddl
-	EstimatedT int       //预计耗时
-	SpentT     int       //实际耗时
+	EstimatedT time.Time
+	SpentT     time.Time
 }
 
 type Subtask struct {

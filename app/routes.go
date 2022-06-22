@@ -18,4 +18,9 @@ func addRoutes() {
 	userChange := user.Group("change", middleware.Auth)
 	userChange.POST("/passwd", controller.ChangePassword)
 	userChange.POST("/name", controller.ChangeNickname)
+
+	template := api.Group("template", middleware.Auth)
+	template.GET("/get", controller.GetTemplate)
+	template.POST("/delete", controller.DeleteTemplate)
+	template.POST("/add", controller.AddTemplate)
 }
