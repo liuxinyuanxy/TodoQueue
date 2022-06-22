@@ -1,17 +1,18 @@
 package model
 
 import (
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
+var db *gorm.DB
 
 func Init() {
 	connectDatabase()
-	err := DB.AutoMigrate(&Foo{}) // TODO: add table structs here
+	err := db.AutoMigrate(&User{}, &Todo{}, &TodoDone{})
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -24,12 +25,10 @@ func connectDatabase() {
 		logrus.Panic(err)
 	}
 
-	loginInfo := viper.GetStringMapString("sql")
-
-	dbArgs := loginInfo["username"] + ":" + loginInfo["password"] +
-		"@(localhost)/" + loginInfo["db_name"] + "?charset=utf8mb4&parseTime=True&loc=Local"
+	loginInfo := viper.GetStringMapString("psql")
+	dbArgs := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai", loginInfo["user"], loginInfo["password"], loginInfo["host"], loginInfo["port"], loginInfo["dbname"])
 	var err error
-	DB, err = gorm.Open(mysql.Open(dbArgs), &gorm.Config{})
+	db, err = gorm.Open(postgres.Open(dbArgs), &gorm.Config{})
 	if err != nil {
 		logrus.Panic(err)
 	}
