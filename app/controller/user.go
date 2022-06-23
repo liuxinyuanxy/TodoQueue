@@ -131,7 +131,7 @@ func ChangePassword(c echo.Context) error {
 func ChangeNickname(c echo.Context) error {
 	uid, ok := c.Get("uid").(uint)
 	var nickname string
-	err := echo.FormFieldBinder(c).MustString("nickname", &nickname).BindError()
+	err := echo.FormFieldBinder(c).MustString("name", &nickname).BindError()
 	if !ok || err != nil {
 		return c.JSON(http.StatusBadRequest, response.Response{Code: 10010, Msg: "get uid or nickname wrong"})
 	}
