@@ -171,7 +171,7 @@ func DeleteDoneById(doneID uint) (err error) {
 }
 
 func StartTodoById(todoID uint) (err error) {
-	updater := map[string]any{"priority": 0, "last_work_t": utils.CurrentTime()}
+	updater := map[string]interface{}{"priority": 0, "last_work_t": utils.CurrentTime()}
 	result := db.Model(&Todo{ID: todoID}).Updates(updater)
 
 	if result.Error != nil {

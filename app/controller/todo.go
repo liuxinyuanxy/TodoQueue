@@ -102,7 +102,7 @@ func GetTodoInfo(c echo.Context) error {
 // GetTodoList
 // @tags Todo
 // @summary GetTodoList
-// @description Get a todolist by uid
+// @description Get a todolist by uid, which is ordered by priority
 // @router /todo/list [get]
 // @accept json
 // @produce json
