@@ -23,8 +23,31 @@ import (
 // @failure 404 {object} response.Response10020 "Invalid ID"
 // @failure 500 "database error"
 func StartProgress(c echo.Context) error {
+	var id uint
+	if err := echo.FormFieldBinder(c).MustUint("id", &id).BindError(); err != nil {
+		return c.JSON(http.StatusBadRequest, response.Response{
+			10010,
+			"Params error: " + err.Error(),
+		})
+	}
 
-	return nil
+	err := model.StartTodoById(id)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return c.JSON(http.StatusNotFound, response.Response{
+			10020,
+			"Invalid ID",
+		})
+	}
+	if err != nil {
+		logrus.Error(err)
+		return c.JSON(http.StatusInternalServerError, response.Response{
+			Msg: "Database error",
+		})
+	}
+
+	return c.JSON(http.StatusOK, response.Response{
+		Msg: "OK",
+	})
 }
 
 // SuspendProgress
@@ -41,8 +64,37 @@ func StartProgress(c echo.Context) error {
 // @failure 406 {object} response.Response10011 "Todo doesn't in progress"
 // @failure 500 "database error"
 func SuspendProgress(c echo.Context) error {
+	var id uint
+	if err := echo.FormFieldBinder(c).MustUint("id", &id).BindError(); err != nil {
+		return c.JSON(http.StatusBadRequest, response.Response{
+			10010,
+			"Params error: " + err.Error(),
+		})
+	}
 
-	return nil
+	err := model.SuspendTodoById(id)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return c.JSON(http.StatusNotFound, response.Response{
+			10020,
+			"Invalid ID",
+		})
+	}
+	if errors.Is(err, gorm.ErrInvalidData) {
+		return c.JSON(http.StatusNotAcceptable, response.Response{
+			Code: 10011,
+			Msg:  "Todo doesn't in process",
+		})
+	}
+	if err != nil {
+		logrus.Error(err)
+		return c.JSON(http.StatusInternalServerError, response.Response{
+			Msg: "Database error",
+		})
+	}
+
+	return c.JSON(http.StatusOK, response.Response{
+		Msg: "OK",
+	})
 }
 
 // FinishProgress
