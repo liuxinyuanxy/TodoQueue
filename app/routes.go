@@ -3,29 +3,25 @@ package app
 import (
 	"TodoQueue/app/controller"
 	"TodoQueue/app/middleware"
-	"TodoQueue/app/response"
-	"TodoQueue/model"
 	"github.com/labstack/echo/v4"
+	echoMiddleware "github.com/labstack/echo/v4/middleware"
+	"github.com/sirupsen/logrus"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"net/http"
 )
 
 func ping(c echo.Context) error {
 
-	newDone := model.TodoDone{
-		ID:    2,
-		UID:   1,
-		Title: "asf",
-	}
-	model.CreateDone(&newDone)
-
-	c.JSON(http.StatusOK, response.Response{
-		Msg: "pong!",
-	})
-	return nil
+	logrus.Debug(c.RealIP())
+	return c.String(http.StatusOK, "pong!")
 }
 
 func addRoutes() {
+
+	e.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+	}))
 	api := e.Group("api")
 
 	api.GET("/doc/*", echoSwagger.WrapHandler)
