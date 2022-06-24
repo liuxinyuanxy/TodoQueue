@@ -21,7 +21,12 @@ import (
 // @param email query string true "user's email"
 // @param passwd query string true "user's password"
 // @param name query string true "user's nickname"
+// @accept json
 // @produce json
+// @success 200 "OK"
+// @failure 400 {object} response.Response10010 "get name or passwd wrong"
+// @failure 202 {object} response.Response10001 "email has been used"
+// @failure 500 {object} response.Response10053 "Create user failed"
 func SignIn(c echo.Context) error {
 	// first, we get the name and password
 	var email, passwd, name string
@@ -38,7 +43,7 @@ func SignIn(c echo.Context) error {
 	password := []byte(passwd)
 	err = model.CreateUser(&model.User{Email: email, Password: password, Nickname: name})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, response.Response{Msg: "Create user failed"})
+		return c.JSON(http.StatusInternalServerError, response.Response{Code: 10053, Msg: "Create user failed"})
 	}
 	return c.JSON(http.StatusOK, response.Response{Msg: "Created user " + name})
 }
@@ -50,7 +55,13 @@ func SignIn(c echo.Context) error {
 // @router /user/login [post]
 // @param email query string true "user's email"
 // @param passwd query string true "user's password"
+// @accept json
 // @produce json
+// @success 200 "OK"
+// @failure 400 {object} response.Response10010 "Get name or passwd wrong"
+// @failure 404 {object} response.Response10020 "User not found"
+// @failure 403 {object} response.Response10030 "Wrong password"
+// @failure 500 {object} response.Response10054 "Can not generate token"
 func LogIn(c echo.Context) error {
 	// first, we get name and password
 	var email, passwd string
@@ -71,7 +82,7 @@ func LogIn(c echo.Context) error {
 	tokenString, expireAt, err := utils.GenerateJwt(dbUser.ID)
 	if err != nil {
 		logrus.Error(err)
-		return c.JSON(http.StatusInternalServerError, response.Response{Msg: "Can not generate token"})
+		return c.JSON(http.StatusInternalServerError, response.Response{Code: 10054, Msg: "Can not generate token"})
 	}
 	cookies := &http.Cookie{Name: "token", Value: tokenString, Expires: expireAt, Path: "/"}
 	c.SetCookie(cookies)
@@ -95,7 +106,13 @@ func LogOut(c echo.Context) error {
 // @router /user/change/passwd [post]
 // @param passwd query string true "user's old password"
 // @param newPasswd query string true "user's new password"
+// @accept json
 // @produce json
+// @success 200 "OK"
+// @failure 400 {object} response.Response10010 "Get uid or passwd wrong"
+// @failure 403 {object} response.Response10031 "User invalid, please log out and log in again"
+// @failure 403 {object} response.Response10030 "Wrong password"
+// @failure 500 {object} response.Response10052 "Change password failed"
 func ChangePassword(c echo.Context) error {
 	uid, ok := c.Get("uid").(uint)
 	var passwd, newPasswd string
@@ -105,7 +122,7 @@ func ChangePassword(c echo.Context) error {
 	}
 	dbUser, err := model.QueryUserByUid(uid)
 	if err != nil {
-		return c.JSON(http.StatusForbidden, response.Response{Code: 10030, Msg: "User invalid, please log out and log in again"})
+		return c.JSON(http.StatusForbidden, response.Response{Code: 10031, Msg: "User invalid, please log out and log in again"})
 	}
 	password := []byte(passwd)
 	if bcrypt.CompareHashAndPassword(dbUser.Password, password) == bcrypt.ErrMismatchedHashAndPassword {
@@ -113,7 +130,7 @@ func ChangePassword(c echo.Context) error {
 	}
 	err = model.UpdateUserPassword(uid, []byte(newPasswd))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, response.Response{Msg: "Change password failed"})
+		return c.JSON(http.StatusInternalServerError, response.Response{Code: 10052, Msg: "Change password failed"})
 	}
 	cookies, err := utils.GenerateCookie(uid)
 	if err == nil {
@@ -127,7 +144,11 @@ func ChangePassword(c echo.Context) error {
 // @summary Change Nickname
 // @router /user/change/name [post]
 // @param name query string true "user's new nickname"
+// @accept json
 // @produce json
+// @success 200 "OK"
+// @failure 400 {object} response.Response10010 "Get uid or passwd wrong"
+// @failure 500 {object} response.Response10051 "Change password failed"
 func ChangeNickname(c echo.Context) error {
 	uid, ok := c.Get("uid").(uint)
 	var nickname string
@@ -137,7 +158,7 @@ func ChangeNickname(c echo.Context) error {
 	}
 	err = model.UpdateUserNickname(uid, nickname)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, response.Response{Msg: "Change nickname failed"})
+		return c.JSON(http.StatusInternalServerError, response.Response{Code: 10051, Msg: "Change nickname failed"})
 	}
 	return c.JSON(http.StatusOK, response.Response{Msg: "Change nickname success"})
 }
