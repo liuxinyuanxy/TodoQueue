@@ -111,7 +111,7 @@ func GetTodoInfo(c echo.Context) error {
 func GetTodoList(c echo.Context) error {
 	uid := c.Get("uid").(uint)
 
-	result, err := model.QueryTodoListByUID(uid)
+	result, err := model.QueryOrderedTodoListByUID(uid)
 	if err != nil {
 		logrus.Error(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{

@@ -1,9 +1,11 @@
 package model
 
 import (
+	"TodoQueue/utils"
 	"bytes"
 	"database/sql/driver"
 	"encoding/json"
+	"gorm.io/gorm"
 )
 
 type Todo struct {
@@ -99,8 +101,9 @@ func QueryTodoById(todoID uint) (ret Todo, err error) {
 	return
 }
 
-func QueryTodoListByUID(uid uint) (ret []Todo, err error) {
+func QueryOrderedTodoListByUID(uid uint) (ret []Todo, err error) {
 	filter := db.Where("uid = ?", uid)
+	filter = filter.Order("priority ASC")
 	err = filter.Find(&ret).Error
 	return
 }
@@ -128,13 +131,74 @@ func QueryDoneListByUID(uid uint) (ret []TodoDone, err error) {
 	return
 }
 
-func CreateDone(newDone *TodoDone) (err error) {
-	err = db.Create(newDone).Error
+func MoveTodo2Done(todoID uint) (err error) {
+	var todoRec Todo
+	if err = db.Model(&Todo{ID: todoID}).First(&todoRec).Error; err != nil {
+		return err
+	}
+
+	err = db.Transaction(func(tx *gorm.DB) error {
+		if er := tx.Delete(&Todo{ID: todoID}).Error; er != nil {
+			return er
+		}
+		if todoRec.Priority == 0 {
+			todoRec.SpentT += utils.TimeDuration(todoRec.LastWorkT, utils.CurrentTime())
+		}
+		newDone := TodoDone{
+			ID:         todoRec.ID,
+			UID:        todoRec.UID,
+			Title:      todoRec.Title,
+			Subtasks:   todoRec.Subtasks,
+			EstimatedT: todoRec.EstimatedT,
+			SpentT:     todoRec.SpentT,
+		}
+		if er := tx.Create(&newDone).Error; er != nil {
+			return er
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
 	return
 }
 
 func DeleteDoneById(doneID uint) (err error) {
 	filter := db.Where("id = ?", doneID)
 	err = filter.Delete(&TodoDone{}).Error
+	return
+}
+
+func StartTodoById(todoID uint) (err error) {
+	updater := map[string]any{"priority": 0, "last_work_t": utils.CurrentTime()}
+	result := db.Model(&Todo{ID: todoID}).Updates(updater)
+
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected <= 0 {
+		err = gorm.ErrRecordNotFound
+		return
+	}
+
+	return
+}
+
+func SuspendTodoById(todoID uint) (err error) {
+	var inProgress Todo
+	if err = db.Model(&Todo{ID: todoID}).First(&inProgress).Error; err != nil {
+		return err
+	}
+	if inProgress.Priority != 0 {
+		return gorm.ErrInvalidData
+	}
+
+	inProgress.Priority = 1
+	inProgress.SpentT += utils.TimeDuration(inProgress.LastWorkT, utils.CurrentTime())
+
+	if err = db.Model(&Todo{ID: todoID}).Updates(&inProgress).Error; err != nil {
+		return err
+	}
 	return
 }

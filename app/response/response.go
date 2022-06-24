@@ -19,6 +19,11 @@ type Response10010 struct {
 	Msg  interface{}
 }
 
+type Response10011 struct {
+	Code int `example:"10011"`
+	Msg  interface{}
+}
+
 type Response10020 struct {
 	Code int `example:"10020"`
 	Msg  interface{}

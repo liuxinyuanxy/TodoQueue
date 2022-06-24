@@ -56,8 +56,8 @@ func addRoutes() {
 		todo.GET("/list/done", controller.GetDoneList)
 	}
 
-	progress := api.Group("/progress", middleware.Auth)
+	progress := api.Group("/progress", middleware.Auth, middleware.CheckOwner)
 	{
-		progress.POST("/tp", nil)
+		progress.POST("/finish", controller.FinishProgress)
 	}
 }
