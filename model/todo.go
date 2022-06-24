@@ -19,7 +19,7 @@ type Todo struct {
 }
 
 type TodoDone struct {
-	ID         uint `gorm:"not null;autoIncrement"`
+	ID         uint `gorm:"not null;"`
 	UID        uint
 	Title      string
 	Subtasks   subtaskList
