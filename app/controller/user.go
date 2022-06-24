@@ -26,7 +26,7 @@ import (
 // @success 200 "OK"
 // @failure 400 {object} response.Response10010 "get name or passwd wrong"
 // @failure 202 {object} response.Response10001 "email has been used"
-// @failure 500 {object} "Create user failed"
+// @failure 500 "Create user failed"
 func SignIn(c echo.Context) error {
 	// first, we get the name and password
 	var email, passwd, name string
@@ -61,7 +61,7 @@ func SignIn(c echo.Context) error {
 // @failure 400 {object} response.Response10010 "Get name or passwd wrong"
 // @failure 404 {object} response.Response10020 "User not found"
 // @failure 403 {object} response.Response10030 "Wrong password"
-// @failure 500 {object} "Can not generate token"
+// @failure 500 "Can not generate token"
 func LogIn(c echo.Context) error {
 	// first, we get name and password
 	var email, passwd string
