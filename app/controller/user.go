@@ -110,7 +110,7 @@ func LogOut(c echo.Context) error {
 // @produce json
 // @success 200 "OK"
 // @failure 400 {object} response.Response10010 "Get uid or passwd wrong"
-// @failure 403 {object} response.Response10031 "User invalid, please log out and log in again"
+// @failure 403 {object} response.Response10030 "User invalid, please log out and log in again"
 // @failure 403 {object} response.Response10030 "Wrong password"
 // @failure 500 "Change password failed"
 func ChangePassword(c echo.Context) error {
@@ -122,7 +122,7 @@ func ChangePassword(c echo.Context) error {
 	}
 	dbUser, err := model.QueryUserByUid(uid)
 	if err != nil {
-		return c.JSON(http.StatusForbidden, response.Response{Code: 10031, Msg: "User invalid, please log out and log in again"})
+		return c.JSON(http.StatusForbidden, response.Response{Code: 10030, Msg: "User invalid, please log out and log in again"})
 	}
 	password := []byte(passwd)
 	if bcrypt.CompareHashAndPassword(dbUser.Password, password) == bcrypt.ErrMismatchedHashAndPassword {

@@ -28,8 +28,3 @@ type Response10030 struct {
 	Code int `example:"10030"`
 	Msg  interface{}
 }
-
-type Response10031 struct {
-	Code int `example:"10031"`
-	Msg  interface{}
-}
