@@ -11,6 +11,8 @@ COPY . $WORKDIR
 
 RUN cd $WORKDIR && go mod download
 
+RUN cd $WORKDIR && go install github.com/swaggo/swag/cmd/swag@latest && swag init
+
 RUN cd $WORKDIR && go build -o /TodoQueue
 
 FROM alpine:3.15.2
