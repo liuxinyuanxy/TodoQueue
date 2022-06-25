@@ -5,11 +5,10 @@ import (
 )
 
 type User struct {
-	ID         uint   `gorm:"not null;autoIncrement"`
-	Email      string `gorm:"size:40;not null;unique"`
-	Nickname   string `gorm:"column:name;size:40;not null"`
-	Password   []byte `gorm:"column:password;not null"`
-	InProgress string
+	ID       uint   `gorm:"not null;autoIncrement"`
+	Email    string `gorm:"size:40;not null;unique"`
+	Nickname string `gorm:"column:name;size:40;not null"`
+	Password []byte `gorm:"column:password;not null"`
 }
 
 func CreateUser(newUser *User) error {

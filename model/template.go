@@ -12,7 +12,7 @@ type Template struct {
 type TemplateRequest struct {
 	Title      string      `validate:"required"`
 	Subtasks   subtaskList `validate:"required"`
-	EstimatedT string      `validate:"required"`
+	EstimatedT uint        `validate:"required"`
 	Priority   float64     `validate:"required"`
 }
 

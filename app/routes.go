@@ -11,9 +11,8 @@ import (
 )
 
 func ping(c echo.Context) error {
-
-	logrus.Debug(c.RealIP())
-	return c.String(http.StatusOK, "pong!")
+	logrus.Info(c.RealIP())
+	return c.String(http.StatusOK, "pong from "+c.RealIP())
 }
 
 func addRoutes() {

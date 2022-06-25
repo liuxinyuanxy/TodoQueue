@@ -15,8 +15,8 @@ type Todo struct {
 	Subtasks   subtaskList
 	LastWorkT  string  `example:"2006-01-02 07:04:05"` //上一次进行todo的时间
 	Ddl        string  `example:"2006-01-02 07:04:05"` //ddl
-	EstimatedT string  `example:"10"`                  //预计耗时(min)
-	SpentT     string  `example:"10"`                  //实际耗时(min)
+	EstimatedT uint    `example:"10"`                  //预计耗时(min)
+	SpentT     uint    `example:"10"`                  //实际耗时(min)
 	Priority   float64 //优先级
 }
 
@@ -25,8 +25,8 @@ type TodoDone struct {
 	UID        uint
 	Title      string
 	Subtasks   subtaskList
-	EstimatedT string
-	SpentT     string
+	EstimatedT uint
+	SpentT     uint
 }
 
 type Subtask struct {
@@ -40,7 +40,7 @@ type NewTodoReq struct {
 	Title      string `binding:"required" example:"test"`
 	Subtasks   subtaskList
 	Ddl        string  `example:"2006-01-02 07:04:05"`       //ddl
-	EstimatedT string  `example:"10"`                        //预计耗时
+	EstimatedT uint    `example:"10"`                        //预计耗时
 	Priority   float64 `binding:"oneof=1 2 3 4" example:"4"` //优先级
 }
 
@@ -49,8 +49,8 @@ type ChangeTodoInfoReq struct {
 	Subtasks   subtaskList
 	LastWorkT  string  `example:"2006-01-02 07:04:05"` //上一次进行todo的时间
 	Ddl        string  `example:"2006-01-02 07:04:05"` //ddl
-	EstimatedT string  `example:"10"`                  //预计耗时(min)
-	SpentT     string  `example:"10"`                  //实际耗时(min)
+	EstimatedT uint    `example:"10"`                  //预计耗时(min)
+	SpentT     uint    `example:"10"`                  //实际耗时(min)
 	Priority   float64 //优先级
 }
 
@@ -74,8 +74,8 @@ func NewTodo(id ...uint) *Todo {
 	return &Todo{
 		ID:         iD,
 		UID:        0,
-		EstimatedT: "",
-		SpentT:     "",
+		EstimatedT: 0,
+		SpentT:     0,
 	}
 }
 
