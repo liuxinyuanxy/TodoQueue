@@ -9,7 +9,7 @@ import (
 )
 
 type Todo struct {
-	ID         uint `gorm:"not null;autoIncrement"`
+	ID         uint `gorm:"not null;autoIncrement;primaryKey"`
 	UID        uint
 	Title      string
 	Subtasks   subtaskList
@@ -21,7 +21,7 @@ type Todo struct {
 }
 
 type TodoDone struct {
-	ID         uint `gorm:"not null;"`
+	ID         uint `gorm:"column:tid;index;not null;primaryKey"`
 	UID        uint
 	Title      string
 	Subtasks   subtaskList
@@ -82,7 +82,7 @@ func NewTodo(id ...uint) *Todo {
 func CertificateTodo(todoID, uID uint) (flag bool, err error) {
 	var uid uint
 	queryTodo := db.Model(&Todo{}).Select("uid").Where("id = ?", todoID)
-	queryDone := db.Model(&TodoDone{}).Select("uid").Where("id = ?", todoID)
+	queryDone := db.Model(&TodoDone{}).Select("uid").Where("tid = ?", todoID)
 	queryCTX := db.Raw("? UNION ?", queryTodo, queryDone)
 	if err = queryCTX.Pluck("uid", &uid).Error; err != nil || uid == 0 {
 		return true, err
@@ -120,7 +120,7 @@ func DeleteTodoById(todoID uint) (err error) {
 }
 
 func QueryDoneById(doneID uint) (ret TodoDone, err error) {
-	filter := db.Where("id = ?", doneID)
+	filter := db.Where("tid = ?", doneID)
 	err = filter.First(&ret).Error
 	return
 }
@@ -133,7 +133,7 @@ func QueryDoneListByUID(uid uint) (ret []TodoDone, err error) {
 
 func MoveTodo2Done(todoID uint) (err error) {
 	var todoRec Todo
-	if err = db.Model(&Todo{ID: todoID}).First(&todoRec).Error; err != nil {
+	if err = db.First(&todoRec, todoID).Error; err != nil {
 		return err
 	}
 
@@ -165,7 +165,7 @@ func MoveTodo2Done(todoID uint) (err error) {
 }
 
 func DeleteDoneById(doneID uint) (err error) {
-	filter := db.Where("id = ?", doneID)
+	filter := db.Where("tid = ?", doneID)
 	err = filter.Delete(&TodoDone{}).Error
 	return
 }
@@ -187,7 +187,7 @@ func StartTodoById(todoID uint) (err error) {
 
 func SuspendTodoById(todoID uint) (err error) {
 	var inProgress Todo
-	if err = db.Model(&Todo{ID: todoID}).First(&inProgress).Error; err != nil {
+	if err = db.First(&inProgress, todoID).Error; err != nil {
 		return err
 	}
 	if inProgress.Priority != 0 {
