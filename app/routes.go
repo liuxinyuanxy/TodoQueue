@@ -57,6 +57,9 @@ func addRoutes() {
 
 	progress := api.Group("/progress", middleware.Auth, middleware.CheckOwner)
 	{
+		progress.POST("/start", controller.StartProgress)
+		progress.POST("/suspend", controller.SuspendProgress)
 		progress.POST("/finish", controller.FinishProgress)
+
 	}
 }
