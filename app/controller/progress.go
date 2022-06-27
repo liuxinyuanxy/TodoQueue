@@ -171,7 +171,7 @@ func FinishProgress(c echo.Context) error {
 // @router /progress/get [get]
 // @accept json
 // @produce json
-// @success 200 {int} int "todoID, if no todo in progress, will return 0"
+// @success 200 {object} response.Response{Msg=int} "Msg is todoID, if no todo in progress, will return 0"
 // @failure 500 "Failed to get todo in progress"
 func GetProgress(c echo.Context) error {
 	uid := c.Get("uid").(uint)

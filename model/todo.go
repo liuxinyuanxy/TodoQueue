@@ -216,7 +216,7 @@ func SuspendTodoById(todoID uint) (err error) {
 }
 
 func GetTodoInProgressByUid(uid uint) (todoID uint, err error) {
-	filter := db.Where("uid = ?", uid)
+	filter := db.Model(&Todo{}).Where("uid = ?", uid)
 	filter = filter.Where("priority = ?", 0)
 	if err = filter.Pluck("id", &todoID).Error; err != nil {
 		return
