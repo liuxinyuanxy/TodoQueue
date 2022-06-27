@@ -15,23 +15,50 @@ import (
 // @summary StartProgress
 // @description Start a todo by id
 // @router /progress/start [post]
-// @param id query int true "todo's id"
+// @param id query int false "todo's id, if id is empty or no more than 0, it will start todo at the top of queue"
 // @accept json
 // @produce json
 // @success 200 "OK"
 // @failure 400 {object} response.Response10010 "Params error"
 // @failure 404 {object} response.Response10020 "Invalid ID"
-// @failure 500 "database error"
+// @failure 404 "No todo in list"
+// @failure 406 "There has been a todo in progress"
+// @failure 500 "Failed to start progress"
 func StartProgress(c echo.Context) error {
+	uid := c.Get("uid").(uint)
 	var id uint
-	if err := echo.FormFieldBinder(c).MustUint("id", &id).BindError(); err != nil {
-		return c.JSON(http.StatusBadRequest, response.Response{
-			10010,
-			"Params error: " + err.Error(),
+
+	inProg, err := model.GetTodoInProgressByUid(uid)
+	if err != nil {
+		logrus.Error(err)
+		return c.JSON(http.StatusInternalServerError, response.Response{
+			Msg: "Failed to start progress",
+		})
+	}
+	if inProg > 0 {
+		return c.JSON(http.StatusNotAcceptable, response.Response{
+			Msg: "There has been a todo in progress",
 		})
 	}
 
-	err := model.StartTodoById(id)
+	if err := echo.FormFieldBinder(c).MustUint("id", &id).BindError(); err != nil {
+		logrus.Info("use default param: ", err.Error())
+		ids, err := model.QueryOrderedTodoListByUID(uid)
+		if err != nil {
+			logrus.Error(err)
+			return c.JSON(http.StatusInternalServerError, response.Response{
+				Msg: "Failed to start progress",
+			})
+		}
+		if len(ids) <= 0 {
+			return c.JSON(http.StatusNotFound, response.Response{
+				Msg: "No todo in list",
+			})
+		}
+		id = ids[0].ID
+	}
+
+	err = model.StartTodoById(id)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return c.JSON(http.StatusNotFound, response.Response{
 			10020,
@@ -41,7 +68,7 @@ func StartProgress(c echo.Context) error {
 	if err != nil {
 		logrus.Error(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{
-			Msg: "Database error",
+			Msg: "Failed to start progress",
 		})
 	}
 
@@ -134,5 +161,29 @@ func FinishProgress(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response.Response{
 		Msg: "OK",
+	})
+}
+
+// GetProgress
+// @tags Progress
+// @summary GetProgress
+// @description Get id of todo in progress
+// @router /progress/get [get]
+// @accept json
+// @produce json
+// @success 200 {int} int "todoID, if no todo in progress, will return 0"
+// @failure 500 "Failed to get todo in progress"
+func GetProgress(c echo.Context) error {
+	uid := c.Get("uid").(uint)
+	todoID, err := model.GetTodoInProgressByUid(uid)
+	if err != nil {
+		logrus.Error(err)
+		return c.JSON(http.StatusInternalServerError, response.Response{
+			Msg: "Failed to get todo in progress",
+		})
+	}
+
+	return c.JSON(http.StatusOK, response.Response{
+		Msg: todoID,
 	})
 }

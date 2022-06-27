@@ -60,6 +60,7 @@ func addRoutes() {
 		progress.POST("/start", controller.StartProgress)
 		progress.POST("/suspend", controller.SuspendProgress)
 		progress.POST("/finish", controller.FinishProgress)
+		progress.GET("/get", controller.GetProgress)
 
 	}
 }

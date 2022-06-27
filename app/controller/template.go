@@ -64,7 +64,7 @@ func DeleteTemplate(c echo.Context) error {
 
 // GetTemplate
 // @tags Template
-// @summary Delete Template
+// @summary Get Template
 // @router /template/get [get]
 // @produce json
 // @success 200 {array} model.Template

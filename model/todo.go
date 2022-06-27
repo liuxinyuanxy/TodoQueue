@@ -44,6 +44,17 @@ type NewTodoReq struct {
 	Priority   float64 `binding:"oneof=1 2 3 4" example:"4"` //优先级
 }
 
+type GetTodoInfoResp struct {
+	ID         uint
+	Title      string
+	Subtasks   subtaskList
+	LastWorkT  string  `example:"2006-01-02 07:04:05"` //上一次进行todo的时间
+	Ddl        string  `example:"2006-01-02 07:04:05"` //ddl
+	EstimatedT uint    `example:"10"`                  //预计耗时(min)
+	SpentT     uint    `example:"10"`                  //实际耗时(min)
+	Priority   float64 //优先级
+}
+
 type ChangeTodoInfoReq struct {
 	Title      string
 	Subtasks   subtaskList
@@ -103,6 +114,7 @@ func QueryTodoById(todoID uint) (ret Todo, err error) {
 
 func QueryOrderedTodoListByUID(uid uint) (ret []Todo, err error) {
 	filter := db.Where("uid = ?", uid)
+	filter = filter.Not("priority = 0")
 	filter = filter.Order("priority ASC")
 	err = filter.Find(&ret).Error
 	return
@@ -199,6 +211,15 @@ func SuspendTodoById(todoID uint) (err error) {
 
 	if err = db.Model(&Todo{ID: todoID}).Updates(&inProgress).Error; err != nil {
 		return err
+	}
+	return
+}
+
+func GetTodoInProgressByUid(uid uint) (todoID uint, err error) {
+	filter := db.Where("uid = ?", uid)
+	filter = filter.Where("priority = ?", 0)
+	if err = filter.Pluck("id", &todoID).Error; err != nil {
+		return
 	}
 	return
 }

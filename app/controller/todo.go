@@ -19,11 +19,11 @@ import (
 // @param data body model.NewTodoReq true "new todo info"
 // @accept json
 // @produce json
-// @success 200 "OK"
+// @success 200 "title"
 // @failure 400 {object} response.Response10010 "params error"
 // @failure 400 {object} response.Response10010 "invalid priority"
 // @failure 400 {object} response.Response10002 "empty title"
-// @failure 500 "database error"
+// @failure 500 "Failed to creat new todo"
 func NewTodo(c echo.Context) error {
 	newTodo := model.NewTodo()
 	uid := c.Get("uid").(uint)
@@ -50,12 +50,12 @@ func NewTodo(c echo.Context) error {
 	if err := model.CreateNewTodo(newTodo); err != nil {
 		logrus.Error(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{
-			Msg: "failed to creat new todo",
+			Msg: "Failed to creat new todo",
 		})
 	}
 
 	return c.JSON(http.StatusOK, response.Response{
-		Msg: "OK",
+		Msg: newTodo.Title,
 	})
 }
 
@@ -67,10 +67,10 @@ func NewTodo(c echo.Context) error {
 // @param id query int true "todo's id"
 // @accept json
 // @produce json
-// @success 200 {object} model.Todo "todo info"
+// @success 200 {object} model.GetTodoInfoResp "todo info"
 // @failure 400 {object} response.Response10010 "params error"
 // @failure 404 {object} response.Response10020 "Invalid todo ID"
-// @failure 500 "database error"
+// @failure 500 "Failed to get todo info"
 func GetTodoInfo(c echo.Context) error {
 	var id uint
 	if err := echo.FormFieldBinder(c).MustUint("id", &id).BindError(); err != nil {
@@ -90,12 +90,22 @@ func GetTodoInfo(c echo.Context) error {
 	} else if err != nil {
 		logrus.Error(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{
-			Msg: "Database error",
+			Msg: "Failed to get todo info",
 		})
 	}
 
+	ret := model.GetTodoInfoResp{
+		ID:         result.ID,
+		Title:      result.Title,
+		Subtasks:   result.Subtasks,
+		LastWorkT:  result.LastWorkT,
+		Ddl:        result.Ddl,
+		EstimatedT: result.EstimatedT,
+		SpentT:     result.SpentT,
+		Priority:   result.Priority,
+	}
 	return c.JSON(http.StatusOK, response.Response{
-		Msg: &result,
+		Msg: &ret,
 	})
 }
 
@@ -107,7 +117,7 @@ func GetTodoInfo(c echo.Context) error {
 // @accept json
 // @produce json
 // @success 200 {array}  model.Todo "Todo info list"
-// @failure 500 "database error"
+// @failure 500 "Failed to get todolist"
 func GetTodoList(c echo.Context) error {
 	uid := c.Get("uid").(uint)
 
@@ -115,7 +125,7 @@ func GetTodoList(c echo.Context) error {
 	if err != nil {
 		logrus.Error(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{
-			Msg: "Database error",
+			Msg: "Failed to get todolist",
 		})
 	}
 
@@ -135,7 +145,7 @@ func GetTodoList(c echo.Context) error {
 // @produce json
 // @success 200 "OK"
 // @failure 400 {object} response.Response10010 "params error"
-// @failure 500 "database error"
+// @failure 500 "Failed to change todo info"
 func ChangeTodoInfo(c echo.Context) error {
 	var id uint
 	var newTodo model.ChangeTodoInfoReq
