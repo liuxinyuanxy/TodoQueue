@@ -29,12 +29,7 @@ type TodoDone struct {
 	SpentT     uint
 }
 
-type Subtask struct {
-	Title string `json:"title" binding:"required"`
-	Done  bool   `json:"done" binding:"required"`
-}
-
-type subtaskList []Subtask
+type subtaskList []string
 
 type NewTodoReq struct {
 	Title      string `binding:"required" example:"test"`
@@ -67,7 +62,7 @@ type ChangeTodoInfoReq struct {
 
 func (p subtaskList) Value() (driver.Value, error) {
 	result, err := json.Marshal(p)
-	if err != nil && bytes.Compare(result, []byte("[{}]")) == 0 {
+	if err != nil && bytes.Compare(result, []byte("[]")) == 0 {
 		return nil, nil
 	}
 	return result, err

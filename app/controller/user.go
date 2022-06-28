@@ -32,7 +32,7 @@ func SignIn(c echo.Context) error {
 	var email, passwd, name string
 	err := echo.FormFieldBinder(c).MustString("email", &email).MustString("passwd", &passwd).MustString("name", &name).BindError()
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, response.Response{Code: 10010, Msg: "get name or passwd wrong"})
+		return c.JSON(http.StatusBadRequest, response.Response{Code: 10010, Msg: "get name, email or passwd wrong, " + err.Error()})
 	}
 	// then, we check if there is a user with same name
 	_, err = model.QueryUserByEmail(email)
@@ -67,7 +67,7 @@ func LogIn(c echo.Context) error {
 	var email, passwd string
 	err := echo.FormFieldBinder(c).MustString("email", &email).MustString("passwd", &passwd).BindError()
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, response.Response{Code: 10010, Msg: "get name or passwd wrong"})
+		return c.JSON(http.StatusBadRequest, response.Response{Code: 10010, Msg: "get email or passwd wrong, " + err.Error()})
 	}
 	password := []byte(passwd)
 	// then, we check whether the user exists and whether the password is correct
@@ -130,6 +130,7 @@ func ChangePassword(c echo.Context) error {
 	}
 	err = model.UpdateUserPassword(uid, []byte(newPasswd))
 	if err != nil {
+		logrus.Error(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{Msg: "Change password failed"})
 	}
 	cookies, err := utils.GenerateCookie(uid)
@@ -158,6 +159,7 @@ func ChangeNickname(c echo.Context) error {
 	}
 	err = model.UpdateUserNickname(uid, nickname)
 	if err != nil {
+		logrus.Error(err)
 		return c.JSON(http.StatusInternalServerError, response.Response{Msg: "Change nickname failed"})
 	}
 	return c.JSON(http.StatusOK, response.Response{Msg: "Change nickname success"})
