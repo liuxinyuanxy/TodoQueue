@@ -11,6 +11,11 @@ type User struct {
 	Password []byte `gorm:"column:password;not null"`
 }
 
+type GetUserInfoResp struct {
+	Email    string
+	Nickname string
+}
+
 func CreateUser(newUser *User) error {
 	var err error
 	newUser.Password, err = bcrypt.GenerateFromPassword(newUser.Password, bcrypt.DefaultCost) // encryption

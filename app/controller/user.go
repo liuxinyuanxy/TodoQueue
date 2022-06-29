@@ -13,6 +13,33 @@ import (
 	"time"
 )
 
+// GetUserInfo
+// @tags User
+// @summary GetUserInfo
+// @description Get user's Info!
+// @router /user/get [get]
+// @accept json
+// @produce json
+// @success 200 {object} model.GetUserInfoResp "user's info"
+// @failure 500 "Failed to get user info"
+func GetUserInfo(c echo.Context) error {
+	uid := c.Get("uid").(uint)
+	userInfo, err := model.QueryUserByUid(uid)
+	if err != nil {
+		logrus.Error(err)
+		return c.JSON(http.StatusInternalServerError, response.Response{
+			Msg: "Failed to get user info",
+		})
+	}
+	var retInfo = model.GetUserInfoResp{
+		Email:    userInfo.Email,
+		Nickname: userInfo.Nickname,
+	}
+	return c.JSON(http.StatusOK, response.Response{
+		Msg: &retInfo,
+	})
+}
+
 // SignIn
 // @tags User
 // @summary Sign in
