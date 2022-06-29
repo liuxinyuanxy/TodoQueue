@@ -18,7 +18,7 @@ import (
 // @param id query int false "todo's id, if id is empty or no more than 0, it will start todo at the top of queue"
 // @accept json
 // @produce json
-// @success 200 "OK"
+// @success 200 {object} response.Response{msg=int} "msg is progress's id"
 // @failure 400 {object} response.Response10010 "Params error"
 // @failure 404 {object} response.Response10020 "Invalid ID"
 // @failure 404 "No todo in list"
@@ -73,7 +73,7 @@ func StartProgress(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response.Response{
-		Msg: "OK",
+		Msg: id,
 	})
 }
 
@@ -171,7 +171,7 @@ func FinishProgress(c echo.Context) error {
 // @router /progress/get [get]
 // @accept json
 // @produce json
-// @success 200 {object} response.Response{Msg=int} "Msg is todoID, if no todo in progress, will return 0"
+// @success 200 {object} response.Response{msg=int} "Msg is todoID, if no todo in progress, will return 0"
 // @failure 500 "Failed to get todo in progress"
 func GetProgress(c echo.Context) error {
 	uid := c.Get("uid").(uint)
