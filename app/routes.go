@@ -39,8 +39,10 @@ func addRoutes() {
 	template := api.Group("/template", middleware.Auth)
 	{
 		template.GET("/get", controller.GetTemplate)
+		template.GET("/list", controller.GetAllTemplate)
 		template.POST("/delete", controller.DeleteTemplate)
 		template.POST("/add", controller.AddTemplate)
+		template.POST("/change", controller.ChangeTemplate)
 	}
 
 	todo := api.Group("/todo", middleware.Auth, middleware.CheckOwner)

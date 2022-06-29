@@ -76,7 +76,7 @@ func GetTodoInfo(c echo.Context) error {
 	if err := echo.FormFieldBinder(c).MustUint("id", &id).BindError(); err != nil {
 		return c.JSON(http.StatusBadRequest, response.Response{
 			10010,
-			"Praram error: " + err.Error(),
+			"Params error: " + err.Error(),
 		})
 	}
 

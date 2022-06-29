@@ -3,9 +3,11 @@ package controller
 import (
 	"TodoQueue/app/response"
 	"TodoQueue/model"
+	"errors"
 	"github.com/jinzhu/copier"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 	"net/http"
 )
 
@@ -62,22 +64,116 @@ func DeleteTemplate(c echo.Context) error {
 	return c.JSON(http.StatusOK, response.Response{})
 }
 
-// GetTemplate
+// GetAllTemplate
 // @tags Template
-// @summary Get Template
-// @router /template/get [get]
+// @summary Get All Template by uid
+// @router /template/list [get]
+// @accept json
 // @produce json
 // @success 200 {array} model.Template
 // @failure 400 {object} response.Response10010 "Get uid wrong"
-// @failure 500 "Get template failed"
-func GetTemplate(c echo.Context) error {
+// @failure 500 "Get templates failed"
+func GetAllTemplate(c echo.Context) error {
 	uid, ok := c.Get("uid").(uint)
 	if !ok {
 		return c.JSON(http.StatusBadRequest, response.Response{Code: 10010, Msg: "get uid wrong"})
 	}
 	Templates, err := model.GetAllTemplate(uid)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, response.Response{Msg: "get template failed"})
+		return c.JSON(http.StatusInternalServerError, response.Response{Msg: "get templates failed"})
 	}
 	return c.JSON(http.StatusOK, response.Response{Msg: Templates})
+}
+
+// GetTemplate
+// @tags Template
+// @summary Get Template by id
+// @router /template/get [get]
+// @param tid query int true "template's id"
+// @accept json
+// @produce json
+// @success 200 {object} model.GetTemplateInfoResp "template info"
+// @failure 400 {object} response.Response10010 "Params error"
+// @failure 404 {object} response.Response10020 "Invalid template ID"
+// @failure 500 "Failed to get template info"
+func GetTemplate(c echo.Context) error {
+	var tid uint
+	if err := echo.FormFieldBinder(c).MustUint("id", &tid).BindError(); err != nil {
+		return c.JSON(http.StatusBadRequest, response.Response{
+			10010,
+			"Params error: " + err.Error(),
+		})
+	}
+
+	result, err := model.QueryTemplateById(tid)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		logrus.Info(err)
+		return c.JSON(http.StatusNotFound, response.Response{
+			10020,
+			"Invalid template ID",
+		})
+	} else if err != nil {
+		logrus.Error(err)
+		return c.JSON(http.StatusInternalServerError, response.Response{
+			Msg: "Failed to get template info",
+		})
+	}
+
+	ret := model.GetTemplateInfoResp{
+		ID:         result.ID,
+		Title:      result.Title,
+		Subtasks:   result.Subtasks,
+		EstimatedT: result.EstimatedT,
+		Priority:   result.Priority,
+	}
+	return c.JSON(http.StatusOK, response.Response{
+		Msg: &ret,
+	})
+}
+
+// ChangeTemplate
+// @tags Template
+// @summary ChangeTodoInfo
+// @description Change a template by id
+// @router /template/change [post]
+// @param tid query int true "template's id"
+// @param data body model.ChangeTemplateReq true "template's new info"
+// @accept json
+// @produce json
+// @success 200 "OK"
+// @failure 400 {object} response.Response10010 "params error"
+// @failure 500 "Failed to change template"
+func ChangeTemplate(c echo.Context) error {
+	var tid uint
+	var newTemplate model.ChangeTemplateReq
+	uid := c.Get("uid").(uint)
+	if err := echo.FormFieldBinder(c).MustUint("id", &tid).BindError(); err != nil {
+		return c.JSON(http.StatusBadRequest, response.Response{
+			10010,
+			"Params error: " + err.Error(),
+		})
+	}
+
+	if err := c.Bind(&newTemplate); err != nil {
+		return c.JSON(http.StatusBadRequest, response.Response{
+			10010,
+			"Params error: " + err.Error(),
+		})
+	}
+
+	var templateInfo model.Template
+	_ = copier.Copy(&templateInfo, newTemplate)
+	templateInfo.ID = tid
+	templateInfo.UID = uid
+
+	if err := model.UpdateTemplateInfo(&templateInfo); err != nil {
+		logrus.Error(err)
+		return c.JSON(http.StatusInternalServerError, response.Response{
+			Msg: "Failed to change template",
+		})
+	}
+
+	return c.JSON(http.StatusOK, response.Response{
+		Msg: "OK",
+	})
 }
