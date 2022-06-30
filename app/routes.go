@@ -31,8 +31,8 @@ func addRoutes() {
 		user.GET("/logout", controller.LogOut)
 		user.POST("/login", controller.LogIn)
 		user.POST("/register", controller.SignIn)
+		user.GET("/get", controller.GetUserInfo, middleware.Auth)
 		userChange := user.Group("/change", middleware.Auth)
-		userChange.GET("/get", controller.GetUserInfo)
 		userChange.POST("/passwd", controller.ChangePassword)
 		userChange.POST("/name", controller.ChangeNickname)
 	}
