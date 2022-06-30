@@ -30,7 +30,7 @@ func AddTemplate(c echo.Context) error {
 	}
 	if !ok || err != nil {
 		logrus.Info(err)
-		return c.JSON(http.StatusBadRequest, response.Response{Code: 10010, Msg: "get uid or template wrong"})
+		return c.JSON(http.StatusBadRequest, response.Response{Code: 10010, Msg: "get uid or template wrong," + err.Error()})
 	}
 	template := model.Template{}
 	err = copier.Copy(&template, templateRequest)

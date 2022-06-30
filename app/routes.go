@@ -18,8 +18,8 @@ func ping(c echo.Context) error {
 func addRoutes() {
 
 	e.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+		AllowOrigins:     []string{"http://124.221.92.18:9404", "http://localhost:9404"},
+		AllowCredentials: true,
 	}))
 	api := e.Group("api")
 
