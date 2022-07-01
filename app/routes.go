@@ -18,7 +18,7 @@ func ping(c echo.Context) error {
 func addRoutes() {
 
 	e.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
-		AllowOrigins:     []string{"http://124.221.92.18:80"},
+		AllowOrigins:     []string{"http://124.221.92.18"},
 		AllowCredentials: true,
 	}))
 	//e.Use(echoMiddleware.BodyDumpWithConfig(DefaultBodyDumpConfig))
