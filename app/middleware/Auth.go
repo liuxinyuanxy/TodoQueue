@@ -4,6 +4,7 @@ import (
 	"TodoQueue/app/response"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
+	"github.com/spf13/viper"
 	"net/http"
 	"strconv"
 )
@@ -18,7 +19,7 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 			var token *jwt.Token
 			claims := &jwt.StandardClaims{}
 			token, err = jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-				return []byte("thisisAkeyqwq"), nil
+				return []byte(viper.GetStringMapString("jwt")["key"]), nil
 			})
 			if err == nil && token.Valid {
 				uid, _ := strconv.Atoi(claims.Subject)
