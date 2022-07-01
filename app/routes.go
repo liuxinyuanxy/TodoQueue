@@ -72,7 +72,7 @@ func addRoutes() {
 //var DefaultBodyDumpConfig = echoMiddleware.BodyDumpConfig{
 //	Skipper: BodyDumpDefaultSkipper,
 //	Handler: func(c echo.Context, reqBody []byte, resBody []byte) {
-//		println("API请求结果拦截：", string(resBody), c.RealIP(), string(reqBody))
+//		println("API请求结果拦截：", string(resBody), c.RealIP())
 //		// 1、解析返回的json数据，判断接口执行成功或失败。如： {"code":"200","data":"test","msg":"请求成功"}
 //		// 2、保存操作日志
 //	},

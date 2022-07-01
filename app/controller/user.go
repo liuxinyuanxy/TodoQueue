@@ -123,7 +123,7 @@ func LogIn(c echo.Context) error {
 // @router /user/logout [get]
 func LogOut(c echo.Context) error {
 	// we can easily log out by erase the cookie
-	c.SetCookie(&http.Cookie{Expires: time.Now().Add(-time.Minute)})
+	c.SetCookie(&http.Cookie{Name: "token", Path: "/", Expires: time.Now().Add(-time.Minute)})
 	return nil
 }
 
